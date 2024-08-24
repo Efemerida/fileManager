@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -38,14 +37,18 @@ func readDataFileOfDir(pathDirectory string) error {
 	//получение файлов директории
 	files, err := os.ReadDir(pathDirectory)
 	if err != nil {
-		errorStr := fmt.Sprintf("Не удалось прочитать директорию: %s\n", pathDirectory)
-		return errors.New(errorStr)
+		return fmt.Errorf("не удалось прочитать директорию: %s\nОшибка: %s", pathDirectory, err)
 	}
 
 	for _, file := range files {
 
+		isDir := file.IsDir()
+
+		var fileSize int64 = 0
+		var fileType = ""
+
 		//если файл - это директория, то подсчитывается общий размер файлов в этой директории, затем печатается
-		if file.IsDir() {
+		if isDir {
 
 			//формирование пути вложенной директории и получение ее размера
 			newPath := fmt.Sprintf("%s/%s", pathDirectory, file.Name())
@@ -55,15 +58,24 @@ func readDataFileOfDir(pathDirectory string) error {
 				continue
 			}
 
-			size, typeSize := calcTypeSize(dirSum)
-			fmt.Printf("Директория%10.1f %-10s %-10s\n", size, typeSize, file.Name())
-			continue
+			fileSize += dirSum
+			fileType = "Директория"
+		} else {
+			fileType = "Файл"
 		}
 
 		//печать файла
-		info, _ := file.Info()
-		size, typeSize := calcTypeSize(info.Size())
-		fmt.Printf("Файл%16.1f %-10s%-10s\n", size, typeSize, file.Name())
+		info, errFileINfo := file.Info()
+		if errFileINfo != nil {
+			fmt.Printf("\nНе удалось получит данные о файле: %s\nОшибка: %s\n\n", file.Name(), errFileINfo)
+			continue
+		}
+
+		fileSize += info.Size()
+
+		size, typeSize := calcTypeSize(fileSize)
+
+		fmt.Printf("%-15s %-5.1f %-10s%-10s\n", fileType, size, typeSize, file.Name())
 	}
 	return nil
 
@@ -72,12 +84,12 @@ func readDataFileOfDir(pathDirectory string) error {
 // calcTypeSize - вычисление более подходящего вида размера и перевод байт в этот размер
 func calcTypeSize(size int64) (float32, string) {
 
-	sizetypes := []string{"байт", "килобайт", "мегабайт", "гигабайт", "терабайт"}
+	sizetypes := []string{"байт", "КБ", "МБ", "ГБ", "ТБ"}
 	typeSize := 0
 	var newSize float32 = float32(size)
 
 	for {
-		var sizeTmp float32 = newSize / 1024.0
+		var sizeTmp float32 = newSize / 1000.0
 
 		if sizeTmp > 1 {
 			newSize = sizeTmp
@@ -109,12 +121,21 @@ func calcSumSizeDirectory(pathDirectory string) (int64, error) {
 		//с этим путем в качестве аргумента
 		if file.IsDir() {
 			newPath := fmt.Sprintf("%s/%s", pathDirectory, file.Name())
-			dirSum, _ := calcSumSizeDirectory(newPath)
+			dirSum, errCalcSumSizeDirectory := calcSumSizeDirectory(newPath)
+			if errCalcSumSizeDirectory != nil {
+				fmt.Printf("Не удалось получить данные о файле: %s\nОшибка: %s\n\n", newPath, errCalcSumSizeDirectory)
+				continue
+			}
+
 			sum += dirSum
 			continue
 		}
 
-		info, _ := file.Info()
+		info, errFileINfo := file.Info()
+		if errFileINfo != nil {
+			fmt.Printf("\nНе удалось получит данные о файле: %s\nОшибка: %s\n\n", file.Name(), errFileINfo)
+			continue
+		}
 		sum += info.Size()
 
 	}
@@ -130,7 +151,7 @@ func readFlags() (string, error) {
 
 	if *directoryPath == "" {
 		flag.PrintDefaults()
-		return "", errors.New("не указана целевая директория")
+		return "", fmt.Errorf("не указана целевая директория")
 	}
 
 	return *directoryPath, nil
