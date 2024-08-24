@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"sort"
+)
 
 type DataFile struct {
 	FileType string
@@ -43,4 +46,16 @@ func calcTypeSize(size int64) (float32, string) {
 
 	}
 	return newSize, sizetypes[typeSize]
+}
+
+func SortDataFiles(dataFiles []DataFile, ask bool) {
+	if !ask {
+		sort.Slice(dataFiles, func(i, j int) bool {
+			return dataFiles[i].FileSize < dataFiles[j].FileSize
+		})
+	} else {
+		sort.Slice(dataFiles, func(i, j int) bool {
+			return dataFiles[i].FileSize > dataFiles[j].FileSize
+		})
+	}
 }

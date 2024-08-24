@@ -20,12 +20,14 @@ func main() {
 	}
 
 	//получение данных о файлах директории
-	errReaddir := readDataFileOfDir(pathMainDirectory)
+	filesData, errReaddir := readDataFileOfDir(pathMainDirectory)
 	if errReaddir != nil {
 		fmt.Printf("Ошибка работы программы: \n%s\n", err)
 		os.Exit(1)
 	}
 
+	SortDataFiles(filesData, true)
+	printFilesData(filesData)
 	//метка завершения программы
 	endTime := time.Now()
 
@@ -33,16 +35,17 @@ func main() {
 }
 
 // readDataFileOfDir - получение данных о файлах директории
-func readDataFileOfDir(pathDirectory string) error {
+func readDataFileOfDir(pathDirectory string) ([]DataFile, error) {
 
 	//получение файлов директории
 	files, err := os.ReadDir(pathDirectory)
 	if err != nil {
-		return fmt.Errorf("не удалось прочитать директорию: %s\nОшибка: %s", pathDirectory, err)
+		return nil, fmt.Errorf("не удалось прочитать директорию: %s\nОшибка: %s", pathDirectory, err)
 	}
 
 	var wg sync.WaitGroup
-	var filesData sync.Map
+
+	var filesData = []DataFile{}
 
 	for _, file := range files {
 
@@ -50,10 +53,8 @@ func readDataFileOfDir(pathDirectory string) error {
 
 		//если файл - это директория, то подсчитывается общий размер файлов в этой директории, затем сохраняется
 		if isDir {
-
 			wg.Add(1)
 			go getSizeDirectory(file, pathDirectory, &filesData, &wg)
-
 		} else {
 
 			info, errFileINfo := file.Info()
@@ -61,34 +62,26 @@ func readDataFileOfDir(pathDirectory string) error {
 				fmt.Printf("\nНе удалось получит данные о файле: %s\nОшибка: %s\n\n", file.Name(), errFileINfo)
 				continue
 			}
-
-			newPath := fmt.Sprintf("%s/%s", pathDirectory, info.Name())
-			filesData.Store(newPath, NewDataFile("Файл", info.Size(), file.Name()))
+			filesData = append(filesData, *NewDataFile("Файл", info.Size(), file.Name()))
 		}
 	}
 
 	wg.Wait()
 
-	printFilesData(&filesData)
-
-	return nil
+	return filesData, nil
 
 }
 
-// printFilesData - печать данных о файлаз в директории
-func printFilesData(filesData *sync.Map) {
-	filesData.Range(func(key, value any) bool {
+// printFilesData - печать данных о файлах в директории
+func printFilesData(filesData []DataFile) {
 
-		if dataFile, ok := value.(*DataFile); ok {
-			dataFile.Print()
-		}
-		return true
-
-	})
+	for _, dataFile := range filesData {
+		dataFile.Print()
+	}
 }
 
 // getSizeDirectory - получение и сохранение данных о директории
-func getSizeDirectory(file os.DirEntry, pathDirectory string, filesData *sync.Map, wg *sync.WaitGroup) {
+func getSizeDirectory(file os.DirEntry, pathDirectory string, filesData *[]DataFile, wg *sync.WaitGroup) {
 
 	defer wg.Done()
 
@@ -108,7 +101,7 @@ func getSizeDirectory(file os.DirEntry, pathDirectory string, filesData *sync.Ma
 	dirSum += fileInfo.Size()
 
 	//сохранение данных о директории
-	filesData.Store(newPath, NewDataFile("Директория", dirSum, file.Name()))
+	*filesData = append(*filesData, *NewDataFile("Директория", dirSum, file.Name()))
 
 }
 
