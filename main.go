@@ -13,7 +13,7 @@ func main() {
 	begunTime := time.Now()
 
 	//чтение флагов
-	pathMainDirectory, err := readFlags()
+	pathMainDirectory, sortFlag, err := readFlags()
 	if err != nil {
 		fmt.Printf("Ошибка запуска: \n%s\n", err)
 		os.Exit(1)
@@ -26,7 +26,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	SortDataFiles(filesData, true)
+	SortDataFiles(filesData, sortFlag)
 	printFilesData(filesData)
 	//метка завершения программы
 	endTime := time.Now()
@@ -147,15 +147,21 @@ func calcSumSizeDirectory(pathDirectory string) (int64, error) {
 }
 
 // readFlugs - считывание фалагов
-func readFlags() (string, error) {
+func readFlags() (string, bool, error) {
 	directoryPath := flag.String("dst", "", "Путь целевой директории")
+	sort := flag.String("sort", "ask", "Сортировка по возрастанию/убыванию")
 
 	flag.Parse()
 
 	if *directoryPath == "" {
 		flag.PrintDefaults()
-		return "", fmt.Errorf("не указана целевая директория")
+		return "", false, fmt.Errorf("не указана целевая директория")
 	}
 
-	return *directoryPath, nil
+	if *sort == "ask" {
+		return *directoryPath, true, nil
+	} else {
+		return *directoryPath, false, nil
+
+	}
 }
