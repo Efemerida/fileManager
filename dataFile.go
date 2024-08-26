@@ -5,20 +5,11 @@ import (
 	"sort"
 )
 
+// DataFile - структура описывающая файл
 type DataFile struct {
-	FileType string
-	FileSize int64
-	FileName string
-}
-
-func NewDataFile(fileType string,
-	fileSize int64,
-	fileName string) *DataFile {
-	return &DataFile{
-		FileType: fileType,
-		FileSize: fileSize,
-		FileName: fileName,
-	}
+	FileType string // тип файла(директория/файл)
+	FileSize int64  // размер файла в байтах
+	FileName string // название файла
 }
 
 // Print - печать в консоли
@@ -48,8 +39,9 @@ func calcTypeSize(size int64) (float32, string) {
 	return newSize, sizetypes[typeSize]
 }
 
-func SortDataFiles(dataFiles []DataFile, ask bool) {
-	if !ask {
+// SortDataFiles - сортировка файлов по размеру
+func SortDataFiles(dataFiles []DataFile, typeSort bool) {
+	if !typeSort {
 		sort.Slice(dataFiles, func(i, j int) bool {
 			return dataFiles[i].FileSize < dataFiles[j].FileSize
 		})

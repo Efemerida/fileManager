@@ -22,7 +22,7 @@ func main() {
 	//получение данных о файлах директории
 	filesData, errReaddir := readDataFileOfDir(pathMainDirectory)
 	if errReaddir != nil {
-		fmt.Printf("Ошибка работы программы: \n%s\n", err)
+		fmt.Printf("Ошибка работы программы: \n%s\n", errReaddir)
 		os.Exit(1)
 	}
 
@@ -44,17 +44,14 @@ func readDataFileOfDir(pathDirectory string) ([]DataFile, error) {
 	}
 
 	var wg sync.WaitGroup
+	var filesData = make([]DataFile, len(files))
 
-	var filesData = []DataFile{}
-
-	for _, file := range files {
-
-		isDir := file.IsDir()
+	for i, file := range files {
 
 		//если файл - это директория, то подсчитывается общий размер файлов в этой директории, затем сохраняется
-		if isDir {
+		if file.IsDir() {
 			wg.Add(1)
-			go getSizeDirectory(file, pathDirectory, &filesData, &wg)
+			go getSizeDirectory(file, pathDirectory, i, filesData, &wg)
 		} else {
 
 			info, errFileINfo := file.Info()
@@ -62,7 +59,7 @@ func readDataFileOfDir(pathDirectory string) ([]DataFile, error) {
 				fmt.Printf("\nНе удалось получит данные о файле: %s\nОшибка: %s\n\n", file.Name(), errFileINfo)
 				continue
 			}
-			filesData = append(filesData, *NewDataFile("Файл", info.Size(), file.Name()))
+			filesData[i] = DataFile{"Файл", info.Size(), file.Name()}
 		}
 	}
 
@@ -81,7 +78,7 @@ func printFilesData(filesData []DataFile) {
 }
 
 // getSizeDirectory - получение и сохранение данных о директории
-func getSizeDirectory(file os.DirEntry, pathDirectory string, filesData *[]DataFile, wg *sync.WaitGroup) {
+func getSizeDirectory(file os.DirEntry, pathDirectory string, index int, filesData []DataFile, wg *sync.WaitGroup) {
 
 	defer wg.Done()
 
@@ -101,8 +98,7 @@ func getSizeDirectory(file os.DirEntry, pathDirectory string, filesData *[]DataF
 	dirSum += fileInfo.Size()
 
 	//сохранение данных о директории
-	*filesData = append(*filesData, *NewDataFile("Директория", dirSum, file.Name()))
-
+	filesData[index] = DataFile{"Директория", dirSum, file.Name()}
 }
 
 // calcSumSizeDirectory - вычисление суммарного размера директории
@@ -149,7 +145,7 @@ func calcSumSizeDirectory(pathDirectory string) (int64, error) {
 // readFlugs - считывание фалагов
 func readFlags() (string, bool, error) {
 	directoryPath := flag.String("dst", "", "Путь целевой директории")
-	sort := flag.String("sort", "ask", "Сортировка по возрастанию/убыванию")
+	sort := flag.String("sort", "", "Сортировка по возрастанию/убыванию")
 
 	flag.Parse()
 
@@ -160,8 +156,11 @@ func readFlags() (string, bool, error) {
 
 	if *sort == "ask" {
 		return *directoryPath, true, nil
-	} else {
+	} else if *sort == "desk" {
 		return *directoryPath, false, nil
-
 	}
+	flag.PrintDefaults()
+	fmt.Printf("Вы не указали сортировку или указали не корректно\nБудет использоваться значение по умолчанию (asc)\n")
+	return *directoryPath, true, nil
+
 }
