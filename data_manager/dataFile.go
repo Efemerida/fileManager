@@ -1,6 +1,7 @@
-package main
+package data_manager
 
 import (
+	"fileService/server"
 	"fmt"
 	"sort"
 )
@@ -16,6 +17,18 @@ type DataFile struct {
 func (dataFile *DataFile) Print() {
 	newSize, newType := calcTypeSize(dataFile.FileSize)
 	fmt.Printf("%-15s %-10.2f %-16s %-10s\n", dataFile.FileType, newSize, newType, dataFile.FileName)
+}
+
+func (dataFile *DataFile) mapToDataFileDto() server.DataFileDto {
+	newSize, newType := calcTypeSize(dataFile.FileSize)
+
+	return server.DataFileDto{
+		FileType:     dataFile.FileType,
+		FileSize:     newSize,
+		FileSizeType: newType,
+		FileName:     dataFile.FileName,
+	}
+
 }
 
 // calcTypeSize - вычисление более подходящего вида размера и перевод байт в этот размер

@@ -8,6 +8,8 @@ import (
 	"os"
 	"time"
 
+	manager "fileService/data_manager"
+
 	"github.com/joho/godotenv"
 )
 
@@ -16,7 +18,7 @@ func main() {
 	begunTime := time.Now()
 
 	if err := godotenv.Load(); err != nil {
-		log.Print("No .env file found")
+		log.Print("файл .env не найден")
 	}
 
 	port, find := os.LookupEnv("PORT")
@@ -42,7 +44,7 @@ func main() {
 		}
 
 		//чтение размеров файлов в директории
-		filesData, errReaddir := ReadDataFileOfDir(dst)
+		filesData, errReaddir := manager.ReadDataFileOfDir(dst)
 
 		// ошибка при выполнении
 		if errReaddir != nil {
@@ -53,7 +55,7 @@ func main() {
 		}
 
 		// сортировка
-		SortDataFiles(filesData, sortFlag)
+		manager.SortDataFiles(filesData, sortFlag)
 
 		//сериализация в json
 		jsonResponce, err := json.MarshalIndent(filesData, "", " ")

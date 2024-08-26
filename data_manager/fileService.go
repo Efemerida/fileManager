@@ -1,7 +1,6 @@
-package main
+package data_manager
 
 import (
-	"flag"
 	"fmt"
 	"os"
 	"sync"
@@ -32,7 +31,8 @@ func ReadDataFileOfDir(pathDirectory string) ([]DataFile, error) {
 				fmt.Printf("\nНе удалось получит данные о файле: %s\nОшибка: %s\n\n", file.Name(), errFileINfo)
 				continue
 			}
-			filesData[i] = DataFile{"Файл", info.Size(), file.Name()}
+			size, sizeType := calcTypeSize(info.Size())
+			filesData[i] = DataFile{"Файл", size, sizeType, file.Name()}
 		}
 	}
 
@@ -40,14 +40,6 @@ func ReadDataFileOfDir(pathDirectory string) ([]DataFile, error) {
 
 	return filesData, nil
 
-}
-
-// printFilesData - печать данных о файлах в директории
-func printFilesData(filesData []DataFile) {
-
-	for _, dataFile := range filesData {
-		dataFile.Print()
-	}
 }
 
 // getSizeDirectory - получение и сохранение данных о директории
@@ -71,7 +63,8 @@ func getSizeDirectory(file os.DirEntry, pathDirectory string, index int, filesDa
 	dirSum += fileInfo.Size()
 
 	//сохранение данных о директории
-	filesData[index] = DataFile{"Директория", dirSum, file.Name()}
+	size, sizeType := calcTypeSize(dirSum)
+	filesData[index] = DataFile{"Директория", size, sizeType, file.Name()}
 }
 
 // calcSumSizeDirectory - вычисление суммарного размера директории
@@ -112,28 +105,5 @@ func calcSumSizeDirectory(pathDirectory string) (int64, error) {
 
 	}
 	return sum, nil
-
-}
-
-// readFlugs - считывание фалагов
-func readFlags() (string, bool, error) {
-	directoryPath := flag.String("dst", "", "Путь целевой директории")
-	sort := flag.String("sort", "", "Сортировка по возрастанию/убыванию")
-
-	flag.Parse()
-
-	if *directoryPath == "" {
-		flag.PrintDefaults()
-		return "", false, fmt.Errorf("не указана целевая директория")
-	}
-
-	if *sort == "ask" {
-		return *directoryPath, true, nil
-	} else if *sort == "desk" {
-		return *directoryPath, false, nil
-	}
-	flag.PrintDefaults()
-	fmt.Printf("Вы не указали сортировку или указали не корректно\nБудет использоваться значение по умолчанию (asc)\n")
-	return *directoryPath, true, nil
 
 }
