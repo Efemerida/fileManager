@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	manager "fileService/data_manager"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -15,6 +14,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// handleGetFiles - обработка запроса по пути /fs
 func handleGetFiles(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("\nЗапрос %s\n", r.RemoteAddr)
 	begunTime := time.Now()
@@ -29,12 +29,12 @@ func handleGetFiles(w http.ResponseWriter, r *http.Request) {
 
 	// ошибка при выполнении
 	if errReaddir != nil {
-		resp := response{
+		responseData := response{
 			Status:    400,
 			TextError: fmt.Sprintf("Ошибка работы программы: %s", errReaddir),
 			Data:      "",
 		}
-		jsonResponce, err := json.MarshalIndent(resp, "", " ")
+		jsonResponce, err := json.MarshalIndent(responseData, "", " ")
 		if err != nil {
 			w.WriteHeader(500)
 			return
@@ -49,19 +49,18 @@ func handleGetFiles(w http.ResponseWriter, r *http.Request) {
 	manager.SortDataFiles(filesData, sortType)
 
 	//перевод данных в транспортировочный вид
-	responseData := []DataFileDto{}
-	for _, val := range filesData {
-		responseData = append(responseData, mapToDataFileDto(val))
+	for _, fileData := range filesData {
+		fileData.MapToDataFileWithTypeSize()
 	}
 
 	//сериализация в json
-	resp := response{
+	responseData := response{
 		Status:    200,
 		TextError: "",
-		Data:      responseData,
+		Data:      filesData,
 	}
 
-	jsonResponce, err := json.MarshalIndent(resp, "", " ")
+	jsonResponce, err := json.MarshalIndent(responseData, "", " ")
 	if err != nil {
 		w.WriteHeader(500)
 		return
@@ -69,28 +68,29 @@ func handleGetFiles(w http.ResponseWriter, r *http.Request) {
 
 	// формирование ответа
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.WriteHeader(200)
 	w.Write(jsonResponce)
 	fmt.Printf("Время обработки запроса:%s\n", time.Since(begunTime))
 }
 
 // StartServer - функция запуска сервера
-func StartServer() {
+func StartServer() error {
 
+	// загрузка данных из .env файлов
 	if err := godotenv.Load(); err != nil {
-		log.Print("файл .env не найден")
+		return fmt.Errorf("ошибка загрузки .emv файла:%s", err)
 	}
 
 	port, find := os.LookupEnv("PORT")
 	if !find {
-		fmt.Printf("ошибка конфига: PORT не найден\n")
-		return
+		return fmt.Errorf("ошибка конфига: PORT не найден")
 	}
 
 	server := http.Server{Addr: port}
 
-	//обработка запроса по пути - /
-	http.HandleFunc("/", handleGetFiles)
+	//обработка запроса по пути - /fs
+	http.HandleFunc("/fs", handleGetFiles)
 
 	//запуск сервера
 	go func() {
@@ -109,8 +109,9 @@ func StartServer() {
 	// закрытие сервера
 	err := server.Shutdown(ctx)
 	if err != nil {
-		fmt.Printf("ошибка закрытия сервера: %s\n", err)
-		os.Exit(1)
+		return fmt.Errorf("ошибка закрытия сервера: %s\n", err)
 	}
+
+	return nil
 
 }

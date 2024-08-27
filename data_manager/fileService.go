@@ -6,7 +6,7 @@ import (
 	"sync"
 )
 
-// readDataFileOfDir - получение данных о файлах директории
+// ReadDataFileOfDir - получение данных о файлах директории
 func ReadDataFileOfDir(pathDirectory string) ([]DataFile, error) {
 
 	//получение файлов директории
@@ -15,38 +15,38 @@ func ReadDataFileOfDir(pathDirectory string) ([]DataFile, error) {
 		return nil, fmt.Errorf("не удалось прочитать директорию: %s Ошибка: %s", pathDirectory, err)
 	}
 
-	var wg sync.WaitGroup
+	var waitGroup sync.WaitGroup
 	var filesData = make([]DataFile, len(files))
 
 	for i, file := range files {
 
 		//если файл - это директория, то подсчитывается общий размер файлов в этой директории, затем сохраняется
 		if file.IsDir() {
-			wg.Add(1)
-			go getSizeDirectory(file, pathDirectory, i, filesData, &wg)
+			waitGroup.Add(1)
+			go getSizeDirectory(file, pathDirectory, i, filesData, &waitGroup)
 		} else {
 
-			info, errFileINfo := file.Info()
+			fileInfo, errFileINfo := file.Info()
 			if errFileINfo != nil {
 				fmt.Printf("Не удалось получит данные о файле: %s Ошибка: %s ", file.Name(), errFileINfo)
 				continue
 			}
-			filesData[i] = DataFile{"Файл", info.Size(), file.Name()}
+			filesData[i] = DataFile{"Файл", float32(fileInfo.Size()), "байт", file.Name()}
 		}
 	}
 
-	wg.Wait()
+	waitGroup.Wait()
 
 	return filesData, nil
 
 }
 
 // getSizeDirectory - получение и сохранение данных о директории
-func getSizeDirectory(file os.DirEntry, pathDirectory string, index int, filesData []DataFile, wg *sync.WaitGroup) {
+func getSizeDirectory(dirEnrty os.DirEntry, pathDirectory string, index int, filesData []DataFile, waitGroup *sync.WaitGroup) {
 
-	defer wg.Done()
+	defer waitGroup.Done()
 
-	fileInfo, errFileINfo := file.Info()
+	fileInfo, errFileINfo := dirEnrty.Info()
 	if errFileINfo != nil {
 		fmt.Printf("Не удалось получит данные о файле: %s Ошибка: %s ", fileInfo.Name(), errFileINfo)
 		return
@@ -54,15 +54,15 @@ func getSizeDirectory(file os.DirEntry, pathDirectory string, index int, filesDa
 
 	//получение размера директории
 	newPath := fmt.Sprintf("%s/%s", pathDirectory, fileInfo.Name())
-	dirSum, errCalcSumSizeDirectory := calcSumSizeDirectory(newPath)
+	directorySum, errCalcSumSizeDirectory := calcSumSizeDirectory(newPath)
 	if errCalcSumSizeDirectory != nil {
 		fmt.Printf("Не удалось открыть директорию: %s Ошибка: %s ", newPath, errCalcSumSizeDirectory)
 		return
 	}
-	dirSum += fileInfo.Size()
+	directorySum += fileInfo.Size()
 
 	//сохранение данных о директории
-	filesData[index] = DataFile{"Директория", dirSum, file.Name()}
+	filesData[index] = DataFile{"Директория", float32(directorySum), "байт", dirEnrty.Name()}
 }
 
 // calcSumSizeDirectory - вычисление суммарного размера директории
@@ -71,11 +71,11 @@ func calcSumSizeDirectory(pathDirectory string) (int64, error) {
 	//считывание содержания директории
 	files, err := os.ReadDir(pathDirectory)
 	if err != nil {
-		return 0, err
+		return 4, err //если не удалось открыть папку возвращается ее размер 4 байта
 	}
 
 	//суммарный размер директории
-	var sum int64 = 0
+	var directorySum int64 = 0
 
 	//проход по кадому файлу
 	for _, file := range files {
@@ -84,24 +84,23 @@ func calcSumSizeDirectory(pathDirectory string) (int64, error) {
 		//с этим путем в качестве аргумента
 		if file.IsDir() {
 			newPath := fmt.Sprintf("%s/%s", pathDirectory, file.Name())
-			dirSum, errCalcSumSizeDirectory := calcSumSizeDirectory(newPath)
+			subDirectorySum, errCalcSumSizeDirectory := calcSumSizeDirectory(newPath)
 			if errCalcSumSizeDirectory != nil {
 				fmt.Printf("Не удалось получить данные о файле: %s Ошибка: %s ", newPath, errCalcSumSizeDirectory)
 				continue
 			}
 
-			sum += dirSum
-			continue
+			directorySum += subDirectorySum
 		}
 
-		info, errFileINfo := file.Info()
+		fileInfo, errFileINfo := file.Info()
 		if errFileINfo != nil {
 			fmt.Printf("Не удалось получит данные о файле: %s Ошибка: %s ", file.Name(), errFileINfo)
 			continue
 		}
-		sum += info.Size()
+		directorySum += fileInfo.Size()
 
 	}
-	return sum, nil
+	return directorySum, nil
 
 }

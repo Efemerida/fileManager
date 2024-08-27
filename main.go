@@ -2,10 +2,16 @@ package main
 
 import (
 	"fileService/server"
+	"fmt"
+	"os"
 )
 
 func main() {
 
-	server.StartServer()
+	err := server.StartServer()
+	if err != nil {
+		fmt.Printf("Ошибка сервера: %s\n", err)
+		os.Exit(1)
+	}
 
 }
