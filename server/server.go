@@ -1,61 +1,82 @@
 package server
 
 import (
+	"context"
 	"encoding/json"
+	manager "fileService/data_manager"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
-
-	manager "fileService/data_manager"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/joho/godotenv"
 )
 
 func handleGetFiles(w http.ResponseWriter, r *http.Request) {
+	fmt.Printf("\nЗапрос %s\n", r.RemoteAddr)
+	begunTime := time.Now()
+
 	dst := r.URL.Query().Get("dst") // dst - параметр пути
 	sort := r.FormValue("sort")     // sort - параметр сортировки
 
-	var sortFlag bool = true
-
-	if sort == "asc" {
-		sortFlag = true
-	} else if sort == "desc" {
-		sortFlag = false
-	}
+	sortType := manager.GetSortType(sort)
 
 	//чтение размеров файлов в директории
 	filesData, errReaddir := manager.ReadDataFileOfDir(dst)
 
 	// ошибка при выполнении
 	if errReaddir != nil {
+		resp := response{
+			Status:    400,
+			TextError: fmt.Sprintf("Ошибка работы программы: %s", errReaddir),
+			Data:      "",
+		}
+		jsonResponce, err := json.MarshalIndent(resp, "", " ")
+		if err != nil {
+			w.WriteHeader(500)
+			return
+		}
 		w.WriteHeader(400)
-		errorStr := fmt.Sprintf("Ошибка работы программы: \n%s\n", errReaddir)
-		w.Write([]byte(errorStr))
+		w.Write(jsonResponce)
+		fmt.Printf("Время обработки запроса:%s\n", time.Since(begunTime))
 		return
 	}
 
 	// сортировка
-	manager.SortDataFiles(filesData, sortFlag)
+	manager.SortDataFiles(filesData, sortType)
 
+	//перевод данных в транспортировочный вид
 	responseData := []DataFileDto{}
-
 	for _, val := range filesData {
-		responseData = append(responseData, val.mapToDataFileDto())
+		responseData = append(responseData, mapToDataFileDto(val))
 	}
 
 	//сериализация в json
-	jsonResponce, err := json.MarshalIndent(responseData, "", " ")
+	resp := response{
+		Status:    200,
+		TextError: "",
+		Data:      responseData,
+	}
+
+	jsonResponce, err := json.MarshalIndent(resp, "", " ")
 	if err != nil {
 		w.WriteHeader(500)
 		return
 	}
 
+	// формирование ответа
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 	w.Write(jsonResponce)
+	fmt.Printf("Время обработки запроса:%s\n", time.Since(begunTime))
 }
 
-func mainn() {
+// StartServer - функция запуска сервера
+func StartServer() {
+
 	if err := godotenv.Load(); err != nil {
 		log.Print("файл .env не найден")
 	}
@@ -73,22 +94,23 @@ func mainn() {
 
 	//запуск сервера
 	go func() {
+		fmt.Printf("Сервер запущен на порту %s...\n", port)
 		errService := server.ListenAndServe()
-		if errService != nil {
-			fmt.Printf("ошибка сервера\n%s\n", errService)
+		if errService != nil && errService != http.ErrServerClosed {
+			fmt.Printf("\nошибка сервера\n%s\n", errService)
 		}
 	}()
 
-	fmt.Printf("Сервер запущен на порту %s...\nВведите exit чтобы закрыть сервер\n", port)
+	// отслеживание сигналов
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTSTP)
+	defer stop()
+	<-ctx.Done()
 
-	//ожидание закрытия сервера
-	for {
-		st := ""
-		fmt.Scan(&st)
-		if st == "exit" {
-			server.Close()
-			break
-		}
-
+	// закрытие сервера
+	err := server.Shutdown(ctx)
+	if err != nil {
+		fmt.Printf("ошибка закрытия сервера: %s\n", err)
+		os.Exit(1)
 	}
+
 }

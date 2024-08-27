@@ -1,7 +1,7 @@
 package server
 
 type response struct {
-	statusCode int
-	textError  string
-	data       any
+	Status    int    //код ответа
+	TextError string // текст ошибки
+	Data      any    // данные
 }
