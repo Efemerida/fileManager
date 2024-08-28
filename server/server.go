@@ -49,8 +49,8 @@ func handleGetFiles(w http.ResponseWriter, r *http.Request) {
 	manager.SortDataFiles(filesData, sortType)
 
 	//перевод данных в транспортировочный вид
-	for _, fileData := range filesData {
-		fileData.MapToDataFileWithTypeSize()
+	for i := 0; i < len(filesData); i++ {
+		filesData[i].MapToDataFileWithTypeSize()
 	}
 
 	//сериализация в json
@@ -109,7 +109,7 @@ func StartServer() error {
 	// закрытие сервера
 	err := server.Shutdown(ctx)
 	if err != nil {
-		return fmt.Errorf("ошибка закрытия сервера: %s\n", err)
+		return fmt.Errorf("ошибка закрытия сервера: %s", err)
 	}
 
 	return nil

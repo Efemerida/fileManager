@@ -1,7 +1,5 @@
 body {
-    font-family: Arial, sans-serif;
     margin: 0;
-    padding: 0;
     background-color: #f4f4f4;
 }
 
@@ -12,23 +10,67 @@ header {
     text-align: center;
 }
 
+
+/* стиль для отображение пути текущей директории */
 h5{
     font-style:initial;
     font-size: 25px;
 }
 
+
+
+
+
+/* стили для таблицы */
+table {
+    width: 100%;
+    margin-top: 20px;
+}
+
+th, td {
+    padding: 10px;
+    border: 1px #dddddd;
+    text-align: left;
+}   
+
+th {
+    background-color: #f4f4f4;
+}
+
+
+
+
+
+/* стили для выделения директории в таблице */
+.directStyle{
+    background-color: #c5c5c5;
+}
+
+.directStyle:hover{
+    background-color: #9b9b9b;
+}
+.directStyle:active{
+    background-color: #696969;
+}
+
+
+
+
+
+
+/* стили для расположения кнопок назад и сотрировка */
 .buttons{
     justify-content: space-between;
     width: 100%;
     display: flex;
 }
 
-.container {
-    width: 80%;
-    margin: 20px auto;
-    background: #ffffff;
-    padding: 20px;
-    border-radius: 5px;
+
+
+
+/* стили для кнопок назад и сотрировка */
+button:active{
+    background-color: #262a2e;
 }
 
 button {
@@ -45,21 +87,19 @@ button:hover {
     background-color: #454d55;
 }
 
-button:active{
-    background-color: #262a2e;
-}
 
-table {
-    width: 100%;
-    margin-top: 20px;
-}
 
-th, td {
-    padding: 10px;
-    border: 1px #dddddd;
-    text-align: left;
-}   
 
-th {
-    background-color: #f4f4f4;
+
+
+
+
+
+/* стиль для главного контейнера */
+.container {
+    width: 80%;
+    margin: 20px auto;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 5px;
 }

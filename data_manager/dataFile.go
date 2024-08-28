@@ -24,7 +24,7 @@ type DataFile struct {
 	FileName     string  `json:"file_name"`      // название файла
 }
 
-// MapToDataFileWithTypeSize - перевод размера файла из байтов в другие типы
+// MapToDataFileWithTypeSize - перевод размера файла в DataFile из байтов в другие типы
 func (dataFile *DataFile) MapToDataFileWithTypeSize() {
 	newSize, newType := calcTypeSize(dataFile.FileSize)
 	dataFile.FileSize = newSize

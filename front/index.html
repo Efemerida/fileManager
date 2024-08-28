@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Таблица Файлов</title>
     <link rel="stylesheet" href="style.css"> 
-    <script src="script.js" defer></script>
+    <script src="script.js"></script>
 </head>
 <body>
 
@@ -14,12 +14,12 @@
 
 <div class="container">
     <div class="buttons">
-        <button>Назад</button>
-        <button>Сортировка</button>
+        <button id="backButton">Назад</button>
+        <button id="sortButton">Сортировка по размеру (возрастание)</button>
     </div>
 
     <div>
-        <h5>/home</h5>
+        <h5 id="currentDirectory">/home</h5>
     </div>
     <table  id="file-table">
         <thead>
@@ -30,36 +30,8 @@
             </tr>
         </thead>
         <tbody>
-            <!-- <tr>
-                <td>example.txt</td>
-                <td>Файл</td>
-                <td>20 МБ</td>
-            </tr>
-            <tr>
-                <td>picture.jpg</td>
-                <td>Файл</td>
-                <td>30 МБ</td>
-            </tr>
-            <tr>
-                <td>documents</td>
-                <td>Директория</td>
-                <td>30 КБ</td>
-            </tr>
-            <tr>
-                <td>audio.mp3</td>
-                <td>Файл</td>
-                <td>600 МБ</td>
-            </tr>
-            <tr>
-                <td>pictures</td>
-                <td>Директория</td>
-                <td>800 МБ</td>
-            </tr> -->
         </tbody>
     </table>
 </div>
-
-
-
 </body>
 </html>
