@@ -28,7 +28,7 @@ export function initScript(){
     setShowCurrentDirectory(document.getElementById("current-directory"))
 
     //получение контейнера, где отображаются данные, плейсхолдера, кнопки сортировки плейсхолдера
-    setContainerContent(document.getElementById('containerData'))
+    setContainerContent(document.getElementById('container-data'))
     setPlaceholder(document.getElementById('placeholder'))
 
     //получение данных при загрузке страницы

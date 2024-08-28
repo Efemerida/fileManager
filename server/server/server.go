@@ -79,6 +79,11 @@ func handleGetFiles(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("Время обработки запроса:%s\n", time.Since(begunTime))
 }
 
+// handleGetMainPage - обработка запроса по пути /
+func handleGetMainPage(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "./../../front/index.html")
+}
+
 // StartServer - функция запуска сервера
 func StartServer() error {
 
@@ -105,6 +110,7 @@ func StartServer() error {
 
 	//обработка запроса по пути - /fs
 	http.HandleFunc("/fs", handleGetFiles)
+	http.HandleFunc("/", handleGetMainPage)
 
 	//запуск сервера
 	go func() {

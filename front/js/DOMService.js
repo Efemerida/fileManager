@@ -54,7 +54,7 @@ export function returnToPreviousDirectory(){
     let arr = currentDir.split('/')
     arr.pop()
     currentDir = arr.join("/")
-    getAndUpdateData(currentDir, currentSort);
+    getAndUpdateData();
 }
 
  // directoryTraversal - переход на дирректорию вглубь и обновление данных
