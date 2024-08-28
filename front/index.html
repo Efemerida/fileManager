@@ -4,26 +4,38 @@
     <meta charset="UTF-8">
     <title>Таблица Файлов</title>
     <link rel="stylesheet" href="style.css"> 
-    <script src="script.js"></script>
+    <script type="module" src="js/main.js"></script>
 </head>
-<body>
+<body class="body">
 
-<header>
+<header class="header">
     <h1>Список Файлов</h1>
 </header>
 
-<div class="container">
+<div id="placeholder" class="container">
     <div class="buttons">
-        <button id="backButton">Назад</button>
-        <button id="sortButton">Сортировка по размеру (возрастание)</button>
+        <button class="button"></button>
+        <button class="button"></button>
+    </div>
+
+    <div class = "waitAnimationContainer">
+        <div class="waitAnimation"></div>
+    </div>
+    
+</div>
+
+<div id="containerData" class="container">
+    <div class="buttons">
+        <button class="button" id="back-button">Назад</button>
+        <button class="button" id="sort-button">Сортировка по размеру (возрастание)</button>
     </div>
 
     <div>
-        <h5 id="currentDirectory">/home</h5>
+        <p class="currentPath" id="current-directory">/home</h5>
     </div>
-    <table  id="file-table">
+    <table class="dataTable" id="file-table">
         <thead>
-            <tr>
+            <tr class="rowHeaderTableStyle">
                 <th>Название</th>
                 <th>Тип</th>
                 <th>Размер</th>

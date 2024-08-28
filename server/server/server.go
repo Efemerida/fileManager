@@ -14,6 +14,9 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// rootDirectory - переменная содержащая корневой каталог из конфига
+var rootDirectory string
+
 // handleGetFiles - обработка запроса по пути /fs
 func handleGetFiles(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("\nЗапрос %s\n", r.RemoteAddr)
@@ -30,9 +33,10 @@ func handleGetFiles(w http.ResponseWriter, r *http.Request) {
 	// ошибка при выполнении
 	if errReaddir != nil {
 		responseData := response{
-			Status:    400,
-			TextError: fmt.Sprintf("Ошибка работы программы: %s", errReaddir),
-			Data:      "",
+			Status:        400,
+			TextError:     fmt.Sprintf("Ошибка работы программы: %s", errReaddir),
+			Data:          "",
+			RootDirectory: "",
 		}
 		jsonResponce, err := json.MarshalIndent(responseData, "", " ")
 		if err != nil {
@@ -55,9 +59,10 @@ func handleGetFiles(w http.ResponseWriter, r *http.Request) {
 
 	//сериализация в json
 	responseData := response{
-		Status:    200,
-		TextError: "",
-		Data:      filesData,
+		Status:        200,
+		TextError:     "",
+		Data:          filesData,
+		RootDirectory: rootDirectory,
 	}
 
 	jsonResponce, err := json.MarshalIndent(responseData, "", " ")
@@ -82,10 +87,19 @@ func StartServer() error {
 		return fmt.Errorf("ошибка загрузки .emv файла:%s", err)
 	}
 
-	port, find := os.LookupEnv("PORT")
-	if !find {
+	//загрузка порта
+	port, findPort := os.LookupEnv("PORT")
+	if !findPort {
 		return fmt.Errorf("ошибка конфига: PORT не найден")
 	}
+
+	//загрузка корневой директории
+	rootDirectoryTmp, findRootDirectory := os.LookupEnv("ROOTDIR")
+	if !findRootDirectory {
+		return fmt.Errorf("ошибка конфига: ROOTDIR не найден")
+	}
+
+	rootDirectory = rootDirectoryTmp
 
 	server := http.Server{Addr: port}
 

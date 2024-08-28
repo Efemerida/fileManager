@@ -1,43 +1,63 @@
-body {
+.body{
     margin: 0;
     background-color: #f4f4f4;
 }
 
-header {
+.header{
     background: #35424a;
     padding: 20px;
     color: #ffffff;
     text-align: center;
 }
 
+/* контейнер для анимации */
+.waitAnimationContainer{
+    display: flex;
+    justify-content: center;
+}
+
+
+/* кружочек плейсхолдера и его анимация */
+.waitAnimation {
+    width: 100px;
+    height: 100px;
+    border-radius: 100%;
+    background-color: #35424a;
+    animation: puls 2s infinite; 
+}
+@keyframes puls {
+    0%, 100%{
+        transform: scale(1);
+        opacity: 0.8; 
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 1; 
+    }
+}
 
 /* стиль для отображение пути текущей директории */
-h5{
+.currentPath{
     font-style:initial;
     font-size: 25px;
 }
 
 
-
-
-
 /* стили для таблицы */
-table {
+.dataTable {
     width: 100%;
     margin-top: 20px;
 }
 
-th, td {
+.rowTableStyle{
     padding: 10px;
     border: 1px #dddddd;
     text-align: left;
 }   
 
-th {
+.rowHeaderTableStyle {
     background-color: #f4f4f4;
 }
-
-
 
 
 
@@ -54,10 +74,6 @@ th {
 }
 
 
-
-
-
-
 /* стили для расположения кнопок назад и сотрировка */
 .buttons{
     justify-content: space-between;
@@ -69,11 +85,11 @@ th {
 
 
 /* стили для кнопок назад и сотрировка */
-button:active{
+.button:active{
     background-color: #262a2e;
 }
 
-button {
+.button {
     margin: 10px;
     padding: 15px;
     background-color: #35424a;
@@ -83,7 +99,7 @@ button {
     border-radius: 4px;
 }
 
-button:hover {
+.button:hover {
     background-color: #454d55;
 }
 
