@@ -28,7 +28,7 @@ func ReadDataFileOfDir(pathDirectory string) ([]DataFile, error) {
 
 			fileInfo, errFileINfo := file.Info()
 			if errFileINfo != nil {
-				fmt.Printf("Не удалось получит данные о файле: %s Ошибка: %s ", file.Name(), errFileINfo)
+				fmt.Printf("Не удалось получит данные о файле: %s Ошибка: %s \n", file.Name(), errFileINfo)
 				continue
 			}
 			filesData[i] = DataFile{"Файл", float32(fileInfo.Size()), "байт", file.Name()}
@@ -48,7 +48,7 @@ func getSizeDirectory(dirEnrty os.DirEntry, pathDirectory string, index int, fil
 
 	fileInfo, errFileINfo := dirEnrty.Info()
 	if errFileINfo != nil {
-		fmt.Printf("Не удалось получит данные о файле: %s Ошибка: %s ", fileInfo.Name(), errFileINfo)
+		fmt.Printf("Не удалось получит данные о файле: %s Ошибка: %s \n", fileInfo.Name(), errFileINfo)
 		return
 	}
 
@@ -56,7 +56,7 @@ func getSizeDirectory(dirEnrty os.DirEntry, pathDirectory string, index int, fil
 	newPath := fmt.Sprintf("%s/%s", pathDirectory, fileInfo.Name())
 	directorySum, errCalcSumSizeDirectory := calcSumSizeDirectory(newPath)
 	if errCalcSumSizeDirectory != nil {
-		fmt.Printf("Не удалось открыть директорию: %s Ошибка: %s ", newPath, errCalcSumSizeDirectory)
+		fmt.Printf("Не удалось открыть директорию: %s Ошибка: %s \n", newPath, errCalcSumSizeDirectory)
 		return
 	}
 	directorySum += fileInfo.Size()
@@ -86,7 +86,7 @@ func calcSumSizeDirectory(pathDirectory string) (int64, error) {
 			newPath := fmt.Sprintf("%s/%s", pathDirectory, file.Name())
 			subDirectorySum, errCalcSumSizeDirectory := calcSumSizeDirectory(newPath)
 			if errCalcSumSizeDirectory != nil {
-				fmt.Printf("Не удалось получить данные о файле: %s Ошибка: %s ", newPath, errCalcSumSizeDirectory)
+				fmt.Printf("Не удалось получить данные о файле: %s Ошибка: %s \n", newPath, errCalcSumSizeDirectory)
 				continue
 			}
 
@@ -95,7 +95,7 @@ func calcSumSizeDirectory(pathDirectory string) (int64, error) {
 
 		fileInfo, errFileINfo := file.Info()
 		if errFileINfo != nil {
-			fmt.Printf("Не удалось получит данные о файле: %s Ошибка: %s ", file.Name(), errFileINfo)
+			fmt.Printf("Не удалось получит данные о файле: %s Ошибка: %s \n", file.Name(), errFileINfo)
 			continue
 		}
 		directorySum += fileInfo.Size()

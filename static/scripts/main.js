@@ -1,6 +1,8 @@
-import {changeSort, setShowCurrentDirectory, returnToPreviousDirectory, getAndUpdateData,
+import {setShowCurrentDirectory, getAndUpdateData,
     setContainerContent,setPlaceholder
-} from "./DOMService.js"
+} from "./tableScript.js"
+
+import {changeSort, returnToPreviousDirectory, asc} from "./buttonsScript.js"
 
 
 
@@ -11,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 // initScript - опрделение обработки нажатий на кнопки и отображение текущей директории
-export function initScript(){
+function initScript(){
 
     //кнопка сортировки
     let sortButton = document.getElementById("sort-button")
@@ -29,7 +31,7 @@ export function initScript(){
     setPlaceholder(document.getElementById('placeholder'))
 
     //получение данных при загрузке страницы
-    getAndUpdateData();
+    getAndUpdateData("/home", asc);
 }
 
 

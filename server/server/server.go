@@ -3,7 +3,7 @@ package server
 import (
 	"context"
 	"encoding/json"
-	manager "fileService/data_manager"
+	manager "fileService/server/data_manager"
 	"fmt"
 	"net/http"
 	"os"
@@ -17,6 +17,28 @@ import (
 // rootDirectory - переменная содержащая корневой каталог из конфига
 var rootDirectory string
 
+// doResponce - формирует ответ
+func doResponce(w http.ResponseWriter, responseData *response, begunTime time.Time) {
+
+	//формирование json
+	jsonResponce, err := json.MarshalIndent(responseData, "", " ")
+	if err != nil {
+		w.WriteHeader(500)
+		return
+	}
+
+	//формирование заголовков
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.WriteHeader(responseData.Status)
+
+	//формирование тела
+	w.Write(jsonResponce)
+
+	//выывод времени запроса
+	fmt.Printf("Время обработки запроса:%s\n", time.Since(begunTime))
+}
+
 // handleGetFiles - обработка запроса по пути /fs
 func handleGetFiles(w http.ResponseWriter, r *http.Request) {
 
@@ -27,27 +49,7 @@ func handleGetFiles(w http.ResponseWriter, r *http.Request) {
 	responseData := response{}
 
 	// формирование ответа
-	defer func() {
-
-		//формирование json
-		jsonResponce, err := json.MarshalIndent(responseData, "", " ")
-		if err != nil {
-			w.WriteHeader(500)
-			return
-		}
-
-		//формирование заголовков
-		w.Header().Set("Content-Type", "application/json")
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.WriteHeader(responseData.Status)
-
-		//формирование тела
-		w.Write(jsonResponce)
-
-		//выывод времени запроса
-		fmt.Printf("Время обработки запроса:%s\n", time.Since(begunTime))
-
-	}()
+	defer doResponce(w, &responseData, begunTime)
 
 	//получение параметров из строки запроса
 	dst := r.URL.Query().Get("dst") // dst - параметр пути
@@ -88,11 +90,8 @@ func handleGetFiles(w http.ResponseWriter, r *http.Request) {
 func handleGetMainPage(w http.ResponseWriter, r *http.Request) {
 
 	//возвращение html файла
-	http.ServeFile(w, r, "./../front/index.html")
+	http.ServeFile(w, r, "./static/index.html")
 
-	//добавление стилей и скриптов
-	http.Handle("/styles/", http.StripPrefix("/styles/", http.FileServer(http.Dir("./../front/styles"))))
-	http.Handle("/scripts/", http.StripPrefix("/scripts/", http.FileServer(http.Dir("./../front/scripts"))))
 }
 
 // StartServer - функция запуска сервера
@@ -117,6 +116,10 @@ func StartServer() error {
 	rootDirectory = rootDirectoryTmp
 
 	server := http.Server{Addr: port}
+
+	//добавление стилей и скриптов
+	http.Handle("/styles/", http.StripPrefix("/styles/", http.FileServer(http.Dir("./static/styles"))))
+	http.Handle("/scripts/", http.StripPrefix("/scripts/", http.FileServer(http.Dir("./static/scripts"))))
 
 	//обработка запроса по пути - /fs
 	http.HandleFunc("/fs", handleGetFiles)

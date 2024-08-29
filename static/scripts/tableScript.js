@@ -1,14 +1,9 @@
 import {fetchData} from "./remoteService.js"
+import {goIntoDirectory, currentDir, setCurrentDir} from "./buttonsScript.js"
 
-const asc = "asc"
-const desc = "desc"
 
-let rootDirecory            //корневая директория
-let currentDir = "/home"  //путь к текущей директории
-let currentSort = asc         // флаг текущей сортировки
 
 let showCurrentDirectory    // элемент отображающий путь к текущей директории
-
 let placeholder             //переменная контейнера плейсхолдера
 let containerContent        //переменная контейнера с данными
 
@@ -30,53 +25,8 @@ export function setContainerContent(newContainerContent){
 
 
 
-//changeSortFlag - изменение флага сортировки и обновление данных
-export function changeSort(){
-    if(currentSort == asc){
-        currentSort = desc
-        this.textContent = "Сортировка по размеру (убывание)"
-    }
-    else{
-        currentSort = asc
-        this.textContent = "Сортировка по размеру (возрастание)"
-    }
-    getAndUpdateData();
-}
-
-
-
-//returnToPreviousDirectory - возвращение на предыдущую директорию в пути обновление данных
-export function returnToPreviousDirectory(){
-    if(currentDir==rootDirecory){
-        alert("вы достигли корневой директории")
-        return
-    }
-    currentDir = currentDir.split('/').slice[0,-1].join("/")
-    getAndUpdateData();
-}
-
- // directoryTraversal - переход на дирректорию вглубь и обновление данных
- function directoryTraversal(path){
-    currentDir = `${currentDir}/${path}`
-    getAndUpdateData();
-}
-
-//getDataAndParseData - получение данные и их представление
-function getDataAndParseData(){
-    return fetchData(`http://localhost:8080/fs?dst=${currentDir}&sort=${currentSort}`).then(responseData => {
-        if(responseData.status==200){
-            rootDirecory = responseData.root_dir
-            return responseData.data;
-        }else{
-            alert(`Ошибка запроса: ${responseData.text_error}`)
-        }
-    })
-}
-
 //updateData - обнавление данных
 function updateData(files){
-     //обновление отображения текущего пути
-     showCurrentDirectory.textContent = currentDir
 
      // поиск и очищение таблицы
      const tbody = document.getElementById('file-table').getElementsByTagName('tbody')[0];
@@ -90,17 +40,32 @@ function updateData(files){
 }
 
 
+//removePlaceholder - скрытие плейсхолдера
+export function removePlaceholder(){
+    containerContent.style.display = "block";
+    placeholder.style.display = "none"
+}
+
 //getAndUpdateData - получение и обновление данных на странице
-export function getAndUpdateData() {
+export function getAndUpdateData(path, sort) {
 
     containerContent.style.display = "none";
     placeholder.style.display = "block"
-    
-    getDataAndParseData().then(
+
+    //обновление отображения текущего пути
+    showCurrentDirectory.textContent = path
+
+    fetchData(path, sort).then(
         files =>{
+
+            //если корневая директория еще не была получена
+            if(currentDir===undefined){
+                setCurrentDir()
+                return
+            }
+
             updateData(files)
-            containerContent.style.display = "block";
-            placeholder.style.display = "none"
+            removePlaceholder()
         } 
     )
 }
@@ -124,19 +89,19 @@ function createRowFromFile(file){
                 row.appendChild(fileType);
 
                 //если это директория - сделать ее кликабельной и добавить ей стиль
-                if(file.file_type=="Директория"){
-                    row.classList.add("directStyle")
+                if(file.file_type==="Директория"){
+                    row.classList.add("direct_style")
                     row.addEventListener('click', function(){
-                        directoryTraversal(file.file_name)
+                        goIntoDirectory(file.file_name)
                     })
                 }
 
 
                 //добавлние классов
-                fileName.classList.add("rowTableStyle")
-                fileSize.classList.add("rowTableStyle")
-                fileType.classList.add("rowTableStyle")
-                row.classList.add("rowTableStyle")
+                fileName.classList.add("row_table_style")
+                fileSize.classList.add("row_table_style")
+                fileType.classList.add("row_table_style")
+                row.classList.add("row_table_style")
 
                 //возвращение строки в таблицу
                 return  row

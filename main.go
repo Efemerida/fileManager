@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fileService/server"
+	"fileService/server/server"
 	"fmt"
 	"os"
 )

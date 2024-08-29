@@ -11,14 +11,14 @@
 }
 
 /* контейнер для анимации */
-.waitAnimationContainer{
+.wait_animation_container{
     display: flex;
     justify-content: center;
 }
 
 
 /* кружочек плейсхолдера и его анимация */
-.waitAnimation {
+.wait_animation {
     width: 100px;
     height: 100px;
     border-radius: 100%;
@@ -37,39 +37,39 @@
 }
 
 /* стиль для отображение пути текущей директории */
-.currentPath{
+.current_path{
     font-style:initial;
     font-size: 25px;
 }
 
 
 /* стили для таблицы */
-.dataTable {
+.data_table {
     width: 100%;
     margin-top: 20px;
 }
 
-.rowTableStyle{
+.row_table_style{
     padding: 10px;
     border: 1px #dddddd;
     text-align: left;
 }   
 
-.rowHeaderTableStyle {
+.row_header_table_style {
     background-color: #f4f4f4;
 }
 
 
 
 /* стили для выделения директории в таблице */
-.directStyle{
+.direct_style{
     background-color: #c5c5c5;
 }
 
-.directStyle:hover{
+.direct_style:hover{
     background-color: #9b9b9b;
 }
-.directStyle:active{
+.direct_style:active{
     background-color: #696969;
 }
 
