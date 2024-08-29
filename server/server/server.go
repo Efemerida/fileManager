@@ -19,8 +19,34 @@ var rootDirectory string
 
 // handleGetFiles - обработка запроса по пути /fs
 func handleGetFiles(w http.ResponseWriter, r *http.Request) {
+
 	fmt.Printf("\nЗапрос %s\n", r.RemoteAddr)
 	begunTime := time.Now()
+
+	responseData := response{}
+
+	// формирование ответа
+	defer func() {
+
+		//формирование json
+		jsonResponce, err := json.MarshalIndent(responseData, "", " ")
+		if err != nil {
+			w.WriteHeader(500)
+			return
+		}
+
+		//формирование заголовков
+		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.WriteHeader(responseData.Status)
+
+		//формирование тела
+		w.Write(jsonResponce)
+
+		//выывод времени запроса
+		fmt.Printf("Время обработки запроса:%s\n", time.Since(begunTime))
+
+	}()
 
 	dst := r.URL.Query().Get("dst") // dst - параметр пути
 	sort := r.FormValue("sort")     // sort - параметр сортировки
@@ -32,20 +58,11 @@ func handleGetFiles(w http.ResponseWriter, r *http.Request) {
 
 	// ошибка при выполнении
 	if errReaddir != nil {
-		responseData := response{
-			Status:        400,
-			TextError:     fmt.Sprintf("Ошибка работы программы: %s", errReaddir),
-			Data:          "",
-			RootDirectory: "",
-		}
-		jsonResponce, err := json.MarshalIndent(responseData, "", " ")
-		if err != nil {
-			w.WriteHeader(500)
-			return
-		}
-		w.WriteHeader(400)
-		w.Write(jsonResponce)
-		fmt.Printf("Время обработки запроса:%s\n", time.Since(begunTime))
+
+		responseData.Status = 400
+		responseData.TextError = fmt.Sprintf("Ошибка работы программы: %s", errReaddir)
+		responseData.Data = ""
+		responseData.RootDirectory = ""
 		return
 	}
 
@@ -57,31 +74,23 @@ func handleGetFiles(w http.ResponseWriter, r *http.Request) {
 		filesData[i].MapToDataFileWithTypeSize()
 	}
 
-	//сериализация в json
-	responseData := response{
-		Status:        200,
-		TextError:     "",
-		Data:          filesData,
-		RootDirectory: rootDirectory,
-	}
+	//запись результата работы
+	responseData.Status = 200
+	responseData.TextError = ""
+	responseData.Data = filesData
+	responseData.RootDirectory = rootDirectory
 
-	jsonResponce, err := json.MarshalIndent(responseData, "", " ")
-	if err != nil {
-		w.WriteHeader(500)
-		return
-	}
-
-	// формирование ответа
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.WriteHeader(200)
-	w.Write(jsonResponce)
-	fmt.Printf("Время обработки запроса:%s\n", time.Since(begunTime))
 }
 
 // handleGetMainPage - обработка запроса по пути /
 func handleGetMainPage(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "./../../front/index.html")
+
+	//возвращение html файла
+	http.ServeFile(w, r, "./../front/index.html")
+
+	//добавление стилей и скриптов
+	http.Handle("/styles/", http.StripPrefix("/styles/", http.FileServer(http.Dir("./../front/styles"))))
+	http.Handle("/scripts/", http.StripPrefix("/scripts/", http.FileServer(http.Dir("./../front/scripts"))))
 }
 
 // StartServer - функция запуска сервера
@@ -103,7 +112,6 @@ func StartServer() error {
 	if !findRootDirectory {
 		return fmt.Errorf("ошибка конфига: ROOTDIR не найден")
 	}
-
 	rootDirectory = rootDirectoryTmp
 
 	server := http.Server{Addr: port}
