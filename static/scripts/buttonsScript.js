@@ -43,7 +43,7 @@ export function goIntoDirectory(path){
 }
 
 
-//returnToPreviousDirectory - возвращение на предыдущую директорию в пути обновление данных
+//returnToPreviousDirectory - возвращение на предыдущую директорию в пути и обновление данных
 export function returnToPreviousDirectory(){
     if(currentDir === rootDirecory){
         alert("вы достигли корневой директории")
