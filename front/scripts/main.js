@@ -4,9 +4,6 @@ import {changeSort, setShowCurrentDirectory, returnToPreviousDirectory, getAndUp
 
 
 
-
-
-
 // загрузка DOM дерева
 document.addEventListener('DOMContentLoaded', function() {
         initScript()

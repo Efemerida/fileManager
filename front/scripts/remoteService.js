@@ -1,6 +1,6 @@
 
 
-// fetchAndUpdateData - получение данных
+// fetchData - получение данных
 export  function fetchData(path) {
     return fetch(path)
         .then(response => {

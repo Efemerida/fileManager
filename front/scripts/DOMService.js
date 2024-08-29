@@ -51,9 +51,7 @@ export function returnToPreviousDirectory(){
         alert("вы достигли корневой директории")
         return
     }
-    let arr = currentDir.split('/')
-    arr.pop()
-    currentDir = arr.join("/")
+    currentDir = currentDir.split('/').slice[0,-1].join("/")
     getAndUpdateData();
 }
 

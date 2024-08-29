@@ -23,6 +23,7 @@ func handleGetFiles(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("\nЗапрос %s\n", r.RemoteAddr)
 	begunTime := time.Now()
 
+	//переменная содержащая ответ
 	responseData := response{}
 
 	// формирование ответа
@@ -48,6 +49,7 @@ func handleGetFiles(w http.ResponseWriter, r *http.Request) {
 
 	}()
 
+	//получение параметров из строки запроса
 	dst := r.URL.Query().Get("dst") // dst - параметр пути
 	sort := r.FormValue("sort")     // sort - параметр сортировки
 
