@@ -2,7 +2,7 @@ import { rootDirecory, setRootDirecory } from "./buttonsScript";
 import {FileData} from "./tableScript"
 
 
-// Определение интерфейса для структуры ответных данных
+// ResponseData - структура ответных данных
 interface ResponseData {
     status: number;
     root_dir?: string; // Може быть undefined

@@ -1,3 +1,5 @@
+import './../styles/style.css';
+
 import {
     setShowCurrentDirectory,
     getAndUpdateData,
@@ -11,8 +13,6 @@ import {
     asc
 } from "./buttonsScript";
 
-import './../styles/style.css';
-
 
 // загрузка DOM дерева
 document.addEventListener('DOMContentLoaded', function() {
@@ -21,18 +21,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // initScript - определение обработки нажатий на кнопки и отображение текущей директории
 function initScript(): void {
+
+
     // кнопка сортировки
     const sortButton = document.getElementById("sort-button") as HTMLButtonElement;
-    if (sortButton) {
-        sortButton.addEventListener('click', changeSort);
-    }
+    sortButton.onclick = changeSort
 
     // кнопка назад
     const backButton = document.getElementById("back-button") as HTMLButtonElement;
-    if (backButton) {
-        backButton.addEventListener('click', returnToPreviousDirectory);
-    }
-
+    backButton.onclick = returnToPreviousDirectory
+    
     // получение и сохранение элемента отображения текущей директории
     const currentDirectoryElement = document.getElementById("current-directory") as HTMLElement;
     setShowCurrentDirectory(currentDirectoryElement);
@@ -40,7 +38,6 @@ function initScript(): void {
     // получение контейнера, где отображаются данные, плейсхолдера, кнопки сортировки плейсхолдера
     const containerDataElement = document.getElementById('container-data') as HTMLElement;
     setContainerContent(containerDataElement);
-    
     const placeholderElement = document.getElementById('placeholder') as HTMLElement;
     setPlaceholder(placeholderElement);
 

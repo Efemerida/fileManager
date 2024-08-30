@@ -86,14 +86,6 @@ func handleGetFiles(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// handleGetMainPage - обработка запроса по пути /
-func handleGetMainPage(w http.ResponseWriter, r *http.Request) {
-
-	//возвращение html файла
-	http.ServeFile(w, r, "./static/index.html")
-
-}
-
 // StartServer - функция запуска сервера
 func StartServer() error {
 
@@ -117,13 +109,12 @@ func StartServer() error {
 
 	server := http.Server{Addr: port}
 
-	//добавление стилей и скриптов
-	http.Handle("/styles/", http.StripPrefix("/styles/", http.FileServer(http.Dir("./static/styles"))))
-	http.Handle("/scripts/", http.StripPrefix("/scripts/", http.FileServer(http.Dir("./static/scripts"))))
+	// handleGetMainPage - обработка запроса по пути /
+	fs := http.FileServer(http.Dir("./static/resource"))
 
 	//обработка запроса по пути - /fs
 	http.HandleFunc("/fs", handleGetFiles)
-	http.HandleFunc("/", handleGetMainPage)
+	http.Handle("/", fs)
 
 	//запуск сервера
 	go func() {

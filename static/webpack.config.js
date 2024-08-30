@@ -3,12 +3,12 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  mode: 'development', // или 'production'
-  entry: './src/ts/main.ts', // точка входа
+  mode: 'development', 
+  entry: './src/scripts/main.ts', // точка входа
   output: {
-    filename: 'bundle.js',  // имя выходного файла
-    path: path.resolve(__dirname, 'dist'), // путь для выходного файла
-    clean: true, // очищает папку dist перед каждой сборкой
+    filename: 'bundle.[contenthash].js',  // имя выходного файла
+    path: path.resolve(__dirname, 'resource'), // путь для выходного файла
+    clean: true, // очищает папку 
   },
   resolve: {
     extensions: ['.ts', '.js', 'css'], // обрабатываемые расширения
@@ -34,5 +34,4 @@ module.exports = {
         filename: 'style.css', // имя выходного файла для CSS
       }),
   ],
-  devtool: 'inline-source-map', // помогает отладке
 };
