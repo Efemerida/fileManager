@@ -1,7 +1,5 @@
     {
         "name": "webpack-setup",
-        "version": "1.0.0",
-        "description": "",
         "main": "static/src/scripts/main.ts",
         "scripts": {
             "build": "webpack --mode production"

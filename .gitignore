@@ -1,6 +1,6 @@
 *.bin
 *.exe
-./static/resource
+static/resource
 package-lock.json
-
+/node_modules
 *.yarn
