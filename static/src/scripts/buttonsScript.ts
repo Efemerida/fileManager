@@ -10,6 +10,7 @@ let currentSort: string = asc; // флаг текущей сортировки
 // setRootDirecory - установка корневой директории и переотправка запроса с корневой
 export function setRootDirecory(path: string): void {
     rootDirecory = path;
+    currentDir = rootDirecory
     getAndUpdateData(rootDirecory, currentSort);
 }
 

@@ -4,10 +4,10 @@ import {FileData} from "./tableScript"
 
 // ResponseData - структура ответных данных
 interface ResponseData {
-    status: number;
-    root_dir?: string; // Може быть undefined
-    data: any; // Замените any на конкретный тип, если знаете структуру данных
-    text_error?: string; // Може быть undefined
+    status: number;         //статус
+    root_dir?: string;      // корневая директория
+    data: any;              // данные
+    text_error?: string;    // текст ошибки
 }
 
 // fetchData - получение данных

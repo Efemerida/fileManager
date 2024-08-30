@@ -3,10 +3,10 @@ import { goIntoDirectory, currentDir, setCurrentDir } from "./buttonsScript";
 
 // Определение типов для файлов
 export interface FileData {
-    file_name: string;
-    file_size: number;
-    file_size_type: string;
-    file_type: string; 
+    file_name: string;              //название файла
+    file_size: number;              //размер файла
+    file_size_type: string;         //тип размера
+    file_type: string;              //тип файла
 }
 
 let showCurrentDirectory: HTMLElement; // элемент отображающий путь к текущей директории
@@ -54,12 +54,6 @@ export function getAndUpdateData(path: string, sort: string): void {
     showCurrentDirectory.textContent = path;
 
     fetchData(path, sort).then(files => {
-        // если корневая директория еще не была получена
-        if (currentDir === undefined) {
-            setCurrentDir();
-            return;
-        }
-
         updateData(files);
         removePlaceholder();
     });

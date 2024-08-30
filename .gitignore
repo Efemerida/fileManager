@@ -1,2 +1,6 @@
 *.bin
 *.exe
+./static/resource
+package-lock.json
+
+*.yarn

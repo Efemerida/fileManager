@@ -17,11 +17,11 @@ import (
 // rootDirectory - переменная содержащая корневой каталог из конфига
 var rootDirectory string
 
-// doResponce - формирует ответ
-func doResponce(w http.ResponseWriter, responseData *response, begunTime time.Time) {
+// doResponse - формирует ответ
+func doResponse(w http.ResponseWriter, responseData *response, begunTime time.Time) {
 
 	//формирование json
-	jsonResponce, err := json.MarshalIndent(responseData, "", " ")
+	jsonResponse, err := json.MarshalIndent(responseData, "", " ")
 	if err != nil {
 		w.WriteHeader(500)
 		return
@@ -33,7 +33,7 @@ func doResponce(w http.ResponseWriter, responseData *response, begunTime time.Ti
 	w.WriteHeader(responseData.Status)
 
 	//формирование тела
-	w.Write(jsonResponce)
+	w.Write(jsonResponse)
 
 	//выывод времени запроса
 	fmt.Printf("Время обработки запроса:%s\n", time.Since(begunTime))
@@ -49,11 +49,19 @@ func handleGetFiles(w http.ResponseWriter, r *http.Request) {
 	responseData := response{}
 
 	// формирование ответа
-	defer doResponce(w, &responseData, begunTime)
+	defer doResponse(w, &responseData, begunTime)
 
 	//получение параметров из строки запроса
 	dst := r.URL.Query().Get("dst") // dst - параметр пути
 	sort := r.FormValue("sort")     // sort - параметр сортировки
+
+	if dst == "" {
+		responseData.Status = 200
+		responseData.TextError = ""
+		responseData.Data = ""
+		responseData.RootDirectory = rootDirectory
+		return
+	}
 
 	sortType := manager.GetSortType(sort)
 

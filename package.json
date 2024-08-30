@@ -1,0 +1,17 @@
+    {
+        "name": "webpack-setup",
+        "version": "1.0.0",
+        "description": "",
+        "main": "static/src/scripts/main.ts",
+        "scripts": {
+            "build": "webpack --mode production"
+        },
+        "devDependencies": {
+        "css-loader": "6.7.1",
+        "html-webpack-plugin": "5.5.0",
+        "mini-css-extract-plugin": "2.6.1",
+        "ts-loader": "9.4.1",
+        "webpack": "5.74.0",
+        "typescript": "5.5.4"
+        }
+    }

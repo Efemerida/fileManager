@@ -2,7 +2,6 @@ import './../styles/style.css';
 
 import {
     setShowCurrentDirectory,
-    getAndUpdateData,
     setContainerContent,
     setPlaceholder
 } from "./tableScript";
@@ -12,6 +11,8 @@ import {
     returnToPreviousDirectory,
     asc
 } from "./buttonsScript";
+
+import{fetchData} from "./remoteService"
 
 
 // загрузка DOM дерева
@@ -42,5 +43,5 @@ function initScript(): void {
     setPlaceholder(placeholderElement);
 
     // получение данных при загрузке страницы
-    getAndUpdateData("/home", asc);
+    fetchData("", asc);
 }
