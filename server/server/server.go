@@ -93,8 +93,8 @@ func sendStats(statsData stats) {
 		return
 	}
 
-	// Проверяем статус ответа
-	status := responseData["status"].(int)
+	//Проверяем статус ответа
+	status := responseData["status"].(float64)
 	message := responseData["message"].(string)
 	if status == 200 {
 		fmt.Println("Статистика успешно отправлена:", message)
@@ -146,15 +146,13 @@ func handleGetFiles(w http.ResponseWriter, r *http.Request) {
 	// сортировка
 	manager.SortDataFiles(filesData, sortType)
 
+	statsData.Size = manager.CalcSumSizeDataFile(filesData)
+	statsData.Root = dst
+
 	//перевод данных в транспортировочный вид
-	var sumSize float32
 	for i := 0; i < len(filesData); i++ {
-		sumSize += filesData[i].FileSize
 		filesData[i].MapToDataFileWithTypeSize()
 	}
-
-	statsData.Root = dst
-	statsData.Size = sumSize
 
 	//запись результата работы
 	responseData.Status = 200

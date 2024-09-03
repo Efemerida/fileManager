@@ -3,8 +3,12 @@
     // Берем данные аунтификации из соответсвющего файла
     include 'auth.php';
 
+
+    try{
+
     // Проверяем, был ли отправлен POST-запрос
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
 
         //Получаем данные из POST-запроса
         header('Content-Type: application/json'); 
@@ -20,7 +24,7 @@
 
         // Проверяем подключение
         if ($conn->connect_error) {
-            die(json_encode(['status' =>  500, 'message' => 'Ошибка подключения: ' . $conn->connect_error]));
+            throw new Exception("Ошибка подключения:  . $conn->connect_error .");
         }
 
         // Подготавливаем запрос INSERT
@@ -33,17 +37,27 @@
 
         // Выполняем запрос
         if ($stmt->execute()) {
-            echo json_encode(['status' => 'success', 'message' => 'Данные успешно добавлены в базу данных!']);
+            echo json_encode(['status' => 200, 'message' => 'Данные успешно добавлены в базу данных!']);
         } else {
-            echo json_encode(['status' => 400, 'message' => 'Ошибка при добавлении данных: ' . $stmt->error]);
+            throw new Exception("Ошибка при добавлении данных:  . $stmt->error .");
         }
 
-        // Закрываем подготовленный запрос
-        $stmt->close();
-
-        // Закрываем подключение
-        $conn->close();
-    } 
-    else {
-        echo json_encode(['status' => 400, 'message' => 'Неверный метод запроса']);
+    }else {
+        throw new Exception('Неверный метод запроса');
     }
+}catch(Exception $exeption){
+    echo json_encode(['status' => 500, 'message' => $exeption -> getMessage()]);
+} finally {
+
+    // Закрываем подготовленный запрос
+    if (!empty($stmt)) $stmt->close();
+
+    // Закрываем подключение
+    if (!empty($conn)) $conn->close();
+}
+    
+
+    //try catch
+    //переделать на байты
+    //обработка ответов в го
+

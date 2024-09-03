@@ -32,6 +32,15 @@ func (dataFile *DataFile) MapToDataFileWithTypeSize() {
 
 }
 
+func CalcSumSizeDataFile(dataFiles []DataFile) float64 {
+	var sumSize float64
+
+	for _, dataFile := range dataFiles {
+		sumSize += float64(dataFile.FileSize)
+	}
+	return sumSize
+}
+
 // calcTypeSize - вычисление более подходящего вида размера и перевод байт в этот размер
 func calcTypeSize(size float32) (float32, string) {
 
