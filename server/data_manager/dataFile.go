@@ -19,7 +19,7 @@ const (
 // DataFile - структура описывающая файл
 type DataFile struct {
 	FileType     string  `json:"file_type"`      // тип файла(директория/файл)
-	FileSize     float32 `json:"file_size"`      // размер файла в байтах
+	FileSize     float32 `json:"file_size"`      // размер файла
 	FileSizeType string  `json:"file_size_type"` // тип размера файла
 	FileName     string  `json:"file_name"`      // название файла
 }
@@ -32,6 +32,7 @@ func (dataFile *DataFile) MapToDataFileWithTypeSize() {
 
 }
 
+// CalcSumSizeDataFile - вычисление суммарного размера файлов
 func CalcSumSizeDataFile(dataFiles []DataFile) float64 {
 	var sumSize float64
 
@@ -46,20 +47,19 @@ func calcTypeSize(size float32) (float32, string) {
 
 	sizeTypes := []string{"байт", "КБ", "МБ", "ГБ", "ТБ"}
 	sizeTypesIndex := 0
-	var newSize float32 = float32(size)
 
 	for {
-		var sizeTmp float32 = newSize / systemSize
+		var sizeTmp float32 = size / systemSize
 
 		if sizeTmp > 1 {
-			newSize = sizeTmp
+			size = sizeTmp
 			sizeTypesIndex++
 		} else {
 			break
 		}
 
 	}
-	return newSize, sizeTypes[sizeTypesIndex]
+	return size, sizeTypes[sizeTypesIndex]
 }
 
 // SortDataFiles - сортировка файлов по размеру

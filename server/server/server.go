@@ -59,17 +59,17 @@ func sendStats(statsData stats) {
 		return
 	}
 
-	// Создаем новый запрос
+	// создаем новый запрос
 	request, err := http.NewRequest("POST", statsURL, bytes.NewBuffer(dataJson))
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	// Устанавливаем заголовок с типом данных в теле запроса
+	// устанавливаем заголовок с типом данных в теле запроса
 	request.Header.Set("Content-Type", "application/json")
 
-	// Выполняем запрос
+	// выполняем запрос
 	client := &http.Client{}
 	responseStat, err := client.Do(request)
 	if err != nil {
@@ -78,14 +78,14 @@ func sendStats(statsData stats) {
 	}
 	defer responseStat.Body.Close()
 
-	// Читаем ответ
+	// читаем ответ
 	responseBody, err := io.ReadAll(responseStat.Body)
 	if err != nil {
 		fmt.Println("Ошибка чтения ответа:", err)
 		return
 	}
 
-	// Декодируем JSON-ответ
+	// декодируем JSON-ответ
 	var responseData map[string]interface{}
 	err = json.Unmarshal(responseBody, &responseData)
 	if err != nil {
@@ -93,7 +93,7 @@ func sendStats(statsData stats) {
 		return
 	}
 
-	//Проверяем статус ответа
+	//проверяем статус ответа
 	status := responseData["status"].(float64)
 	message := responseData["message"].(string)
 	if status == 200 {
@@ -120,6 +120,7 @@ func handleGetFiles(w http.ResponseWriter, r *http.Request) {
 	dst := r.URL.Query().Get("dst") // dst - параметр пути
 	sort := r.FormValue("sort")     // sort - параметр сортировки
 
+	//если директория не пришла отправляется только корневой путь
 	if dst == "" {
 		responseData.Status = 200
 		responseData.TextError = ""
@@ -128,6 +129,7 @@ func handleGetFiles(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//формирование флага сортировки
 	sortType := manager.GetSortType(sort)
 
 	//чтение размеров файлов в директории
@@ -146,6 +148,7 @@ func handleGetFiles(w http.ResponseWriter, r *http.Request) {
 	// сортировка
 	manager.SortDataFiles(filesData, sortType)
 
+	//формирование данных для статистики
 	statsData.Size = manager.CalcSumSizeDataFile(filesData)
 	statsData.Root = dst
 
@@ -176,6 +179,7 @@ func StartServer() error {
 		return fmt.Errorf("ошибка конфига: PORT не найден")
 	}
 
+	//загрузка пути для отправки статистики
 	statsURLTmp, findStatsURL := os.LookupEnv("STATS_URL")
 	if !findStatsURL {
 		return fmt.Errorf("ошибка конфига: STATS_URL не найден")

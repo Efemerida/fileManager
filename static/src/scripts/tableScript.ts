@@ -1,5 +1,5 @@
 import { fetchData } from "./remoteService";
-import { goIntoDirectory, currentDir, setCurrentDir } from "./buttonsScript";
+import { goIntoDirectory} from "./buttonsScript";
 
 // Определение типов для файлов
 export interface FileData {
@@ -34,6 +34,7 @@ function updateData(files: FileData[]): void {
     const tbody = document.getElementById('file-table')!.getElementsByTagName('tbody')[0];
     tbody.innerHTML = '';
 
+    //добавление данных
     files.forEach(file => {
         tbody.appendChild(createRowFromFile(file));
     });
@@ -47,12 +48,15 @@ export function removePlaceholder(): void {
 
 // getAndUpdateData - получение и обновление данных на странице
 export function getAndUpdateData(path: string, sort: string): void {
+    
+    //отображение плейсхолдера
     containerContent.style.display = "none";
     placeholder.style.display = "block";
 
     // обновление отображения текущего пути
     showCurrentDirectory.textContent = path;
 
+    //загрузка и обновление данных
     fetchData(path, sort).then(files => {
         updateData(files);
         removePlaceholder();

@@ -3,8 +3,8 @@ import { getAndUpdateData } from "./tableScript";
 export let rootDirecory: string;  // корневая директория
 export let currentDir: string;     // путь к текущей директории
 
-export const asc: string = "asc";
-const desc: string = "desc";
+export const asc: string = "asc"; //константа для сортировки по возрастанию
+const desc: string = "desc";        //константа для сортировки по убыванию
 let currentSort: string = asc; // флаг текущей сортировки
 
 // setRootDirecory - установка корневой директории и переотправка запроса с корневой
@@ -14,10 +14,6 @@ export function setRootDirecory(path: string): void {
     getAndUpdateData(rootDirecory, currentSort);
 }
 
-// setCurrentDir - установка текущей директории, в момент когда определяется корневая
-export function setCurrentDir(): void {
-    currentDir = rootDirecory;
-}
 
 // changeSort - изменение флага сортировки и обновление данных
 export function changeSort(this: HTMLButtonElement): void {
